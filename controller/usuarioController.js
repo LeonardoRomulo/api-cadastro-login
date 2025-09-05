@@ -1,5 +1,5 @@
-import conexao from "../model/conexao";
-import Usuario from "../model/usuario";
+import conexao from "../model/conexao.js";
+import Usuario from "../model/usuario.js";
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';

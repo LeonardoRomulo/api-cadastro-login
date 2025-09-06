@@ -4,7 +4,8 @@ import { Router } from 'express';
 
 const router = Router();
 
-router.post("/login", validaUsuario, UsuarioController.loginUsuario);
+router.post("/login", UsuarioController.loginUsuario);
 router.get("/usuarios", UsuarioController.listarUsuarios);
+router.post("/cadastro", validaUsuario, UsuarioController.criarUsuario);
 
 export default router;

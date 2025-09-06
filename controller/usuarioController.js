@@ -26,11 +26,22 @@ class UsuarioController {
     static async loginUsuario(req, res) {
         try {
             const { email, senha } = req.body; // captura email e senha digitado pelo usuário no copro da requisição
-            //autenticação do email
+            //autenticação do 
+            
+            //Validação do email e da senha 
+            if (!email || typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}(\.[^\s@]{2,})?$/.test(email.trim())) {
+                return res.status(400).json({ message: "Email inválido" });
+            };
+
+            if (!senha || typeof senha !== 'string' || !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(senha.trim())) {
+                return res.status(400).json({ message: "Senha inválida" })
+            };
+
+
             const query = 'SELECT * FROM usuarios WHERE email =?'; //  query que compara se o email digitado existe no banco de dados
             const [resultado] = await conexao.query(query, [email]); //execução da query que compara se o email existe no bd se sim ele pega a primeira aparição do email e salva em resultado se não houver ele deixa a costante vazia
 
-            //Condicional de validação do email, se a costante resultado tiver o tamanho igual a 0 retorna o status 401 e a mensagem de erro
+            //Condicional de validação das credenciail de  email, se a costante resultado tiver o tamanho igual a 0 retorna o status 401 e a mensagem de erro
             if (resultado.length === 0) {
                 return res.status(401).json({ error: "Email ou senha inválida" });
             }
@@ -39,7 +50,7 @@ class UsuarioController {
             const usuario = resultado[0]; //captura o primeiro usuário no bd com o email informado pelo usuario
             const senhaValida = await bcrypt.compare(senha, usuario.senha);//comparação da senha digitada pelo usuário com o hash da senha no bd usando o bcrypt
 
-
+            //Validação da credencial da senha
             if (!senhaValida) {
                 return res.status(401).json({ error: "Email ou senha inválida" });
             } //Se a senha for inválida retorna o status 401 e a mensagem de erro
@@ -65,7 +76,7 @@ class UsuarioController {
 
     static async listarUsuarios(req, res) {
         try {
-            const query = 'SLECT * FROM usuarios';
+            const query = 'SELECT * FROM usuarios';
             const [usuarios] = await conexao.query(query);
             res.status(200).json(usuarios);
         } catch (err) {

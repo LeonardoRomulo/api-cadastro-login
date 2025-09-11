@@ -1,4 +1,4 @@
-class Barbeiros extends Usuarios {
+class Barbeiro extends Usuarios {
     constructor(nome, email, senha, especialidade,is_adm, foto){
         super(nome, email, senha);
         this.especialidade = especialidade;
@@ -6,4 +6,4 @@ class Barbeiros extends Usuarios {
         this.foto = foto;
     }
 }
-export default Barbeiros;
+export default Barbeiro;

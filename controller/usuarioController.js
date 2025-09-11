@@ -34,7 +34,7 @@ class UsuarioController {
             };
 
             if (!senha || typeof senha !== 'string' || !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(senha.trim())) {
-                return res.status(400).json({ message: "Senha inválida" })
+                return res.status(400).json({ message: "Senha inválida" });
             };
 
 

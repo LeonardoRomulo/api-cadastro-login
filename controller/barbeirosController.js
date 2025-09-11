@@ -1,5 +1,5 @@
-import Barbeiro from "../model/barbeiros";
-import conexao from "../model/conexao";
+import Barbeiro from "../model/barbeiros.js";
+import conexao from "../model/conexao.js";
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
@@ -88,13 +88,15 @@ class BarbeirosController {
 
     static async atualizarBarbeiros(req,res){// utilizar a rota patch
         try {
-            const {id} = req.params;
-            const { nome, email, senha, especialidade, foto } = req.body;
+            const {id} = req.params; //obtem o id do barbeiro que deseja ser atualizado
+            const { nome, email, senha, especialidade, foto } = req.body; // pega os dados informados pelo cliente no corpo da requisição
 
-            const camposBody = {nome, email, especialidade, foto};
-            let campos =[];
+            const camposBody = {nome, email, especialidade, foto}; //Cria um objeto com os dados informados pelo cliente 
+            //monta um array vazio  nas variáveis campos e valores para receber os campos e os valores que vão ser atualizados de forma dinâmica
+            let campos =[]; 
             let valores =[];
 
+            //loop  que usa o metodo nativo do js object.entries que obtem os pares campo e valor que são percorridos pelo loop e adiciona o nome do campo no array campos e o valor no array valores caso caso esse não seja indefenido e atualiza só os campos informados de forma dinâmica.
             for(const[campo, valor] of Object.entries(camposBody)){
                 if(valor !=='undefined') {
                     campos.push(`${campo} = ?`);
@@ -102,22 +104,27 @@ class BarbeirosController {
                 }
             }
 
+            //atualização da senha, o usuário atualiza a senha, ela é criptografada e depois atualizada no bd
             if(senha){
                 const senhaHash = await bcrypt.hash(senha,10);
                 campos.push("senha = ?");
                 valores.push(senhaHash)
             };
 
+            //Condicional para verificar se o array campos está vazio se tiver ele retrona o status 400 e a mensagem de erro
             if(campos.length === 0) {
                 return res.status(400).json({message: "Nenhum campo para atualizar"});
             };
-
+            // adiciona o id que será ataulizado no fim do array valores
             valores.push(id)
-
+            //Aqui montamos a query dinâmicamente recebendo os campos e os valores concatenados com o join e separado por ,
             const query = `UPDATE barbeiros SET ${campos.join(", ")} WHERE id =?`;
             await conexao.query(query, valores)
-            res.status(200).json({message: "Barbeiro atualizado com sucesso"});
+
+            //retorno da mensagem de sucesso
+           return res.status(200).json({message: "Barbeiro atualizado com sucesso"});
         } catch (err) {
+            //retorno da mensagem de erro
             res.status(500).json({message: err.message});
         }
     }

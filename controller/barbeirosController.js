@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 class BarbeirosController {
+    //Metódo para cadastrar um barbeiro
     static async criarBarbeiro(req, res) {
         try {
             const { nome, email, senha, especialidade, is_adm, foto } = req.body;
@@ -25,6 +26,7 @@ class BarbeirosController {
         }
     }
 
+    //Metódo para fazer login dos barbeiros
     static async loginBarbeiro(req, res) {
         try {
             //captura do email e senha digitado pelo cliente no corpo de requisição 
@@ -75,7 +77,7 @@ class BarbeirosController {
         }
     };
 
-
+    //Metódo para listar os barbeiros
     static async listarBarbeiros(req, res) {
         try {
             const query = 'SELECT * FROM barbeiros';
@@ -86,6 +88,7 @@ class BarbeirosController {
         }
     };
 
+    //metódo para atualizar os dados dos barbeiros
     static async atualizarBarbeiros(req,res){// utilizar a rota patch
         try {
             const {id} = req.params; //obtem o id do barbeiro que deseja ser atualizado
@@ -126,6 +129,31 @@ class BarbeirosController {
         } catch (err) {
             //retorno da mensagem de erro
             res.status(500).json({message: err.message});
+        }
+    }
+
+    //Metódo para deletar um barbeiro
+    static async deletarBarbeiro(req,res){
+        try{
+            const {id} = req.params;
+
+            //Validando se o id foi informado
+            if(!id){
+                return res.status(400).json({message: "ID não informado"});
+            }
+
+            //Verifica se o barbeiro existe
+
+            const [existe] = await conexao.query('SELECT id FROM barbeiros WHERE id = ?', [id]);
+            if(existe.length === 0) {
+                return res.status(400).json({message: "Barbeiro não encontrado"});
+            }
+
+            const query = 'DELETE FROM barbeiros WHERE id = ?';
+            await conexao.query(query, [id]);
+            return res.status(200).json({message: "Barbeiro deletado com sucesso"});
+        }catch(err){
+            return res.status(500).json({message: err.message});
         }
     }
 }

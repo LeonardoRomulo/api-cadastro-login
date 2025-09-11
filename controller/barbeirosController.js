@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 class BarbeirosController {
-    static async criarUsuarios(req, res) {
+    static async criarBarbeiros(req, res) {
         try {
             const { nome, email, senha, especialidade, is_adm, foto } = req.body;
             const senhaHash = await bcrypt.hash(senha, 10);

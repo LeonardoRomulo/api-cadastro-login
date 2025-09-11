@@ -85,5 +85,41 @@ class BarbeirosController {
             return res.status(500).json({ message: err.message });
         }
     };
+
+    static async atualizarBarbeiros(req,res){// utilizar a rota patch
+        try {
+            const {id} = req.params;
+            const { nome, email, senha, especialidade, foto } = req.body;
+
+            const camposBody = {nome, email, especialidade, foto};
+            let campos =[];
+            let valores =[];
+
+            for(const[campo, valor] of Object.entries(camposBody)){
+                if(valor !=='undefined') {
+                    campos.push(`${campo} = ?`);
+                    valores.push(valor);
+                }
+            }
+
+            if(senha){
+                const senhaHash = await bcrypt.hash(senha,10);
+                campos.push("senha = ?");
+                valores.push(senhaHash)
+            };
+
+            if(campos.length === 0) {
+                return res.status(400).json({message: "Nenhum campo para atualizar"});
+            };
+
+            valores.push(id)
+
+            const query = `UPDATE barbeiros SET ${campos.join(", ")} WHERE id =?`;
+            await conexao.query(query, valores)
+            res.status(200).json({message: "Barbeiro atualizado com sucesso"});
+        } catch (err) {
+            res.status(500).json({message: err.message});
+        }
+    }
 }
 export default BarbeirosController;

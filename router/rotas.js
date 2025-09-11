@@ -14,4 +14,5 @@ router.post("/barbeiros/cadastro", valida, BarbeirosController.criarBarbeiro);
 router.post("/barbeiros/login", BarbeirosController.loginBarbeiro);
 router.get("/barbeiros", BarbeirosController.listarBarbeiros);
 router.patch("/barbeiros/:id",valida, BarbeirosController.atualizarBarbeiros );
+router.delete("/barbeiros/:id", BarbeirosController.criarBarbeiro);
 export default router;

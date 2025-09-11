@@ -1,11 +1,17 @@
-import validaUsuario from "../middleware/validaUsuario.js";
+import valida from "../middleware/valida.js";
 import UsuarioController from "../controller/usuarioController.js";
 import { Router } from 'express';
+import BarbeirosController from "../controller/barbeirosController.js";
 
 const router = Router();
-
-router.post("/login", UsuarioController.loginUsuario);
+//rotas para usuários
+router.post("/usuarios/login", UsuarioController.loginUsuario);
 router.get("/usuarios", UsuarioController.listarUsuarios);
-router.post("/cadastro", validaUsuario, UsuarioController.criarUsuario);
+router.post("/usuarios/cadastro", valida , UsuarioController.criarUsuario);
 
+//rotas para barbeiros
+router.post("/barbeiros/cadastro", valida, BarbeirosController.criarBarbeiro);
+router.post("/barbeiros/login", BarbeirosController.loginBarbeiro);
+router.get("/barbeiros", BarbeirosController.listarBarbeiros);
+router.patch("/barbeiros/:id",valida, BarbeirosController.atualizarBarbeiros );
 export default router;

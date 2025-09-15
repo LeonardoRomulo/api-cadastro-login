@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import routerServicos from './router/rotasServicos.js';
 import routerBarbeiros from './router/rotasBarbeiros.js';
+import routerAgendamentos from './router/rotasAgendamento.js';
 
 const app = express();
 app.use(cors());
@@ -11,6 +12,7 @@ app.use(express.json());
 app.use(routerUsuarios);
 app.use(routerBarbeiros);
 app.use(routerServicos);
+app.use(routerAgendamentos);
 
 app.listen(9000, () => {
     const date = new Date();

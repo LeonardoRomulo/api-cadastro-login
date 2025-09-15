@@ -32,8 +32,27 @@ class AgendamentoController {
         // Implementação futura
     }
 
-    static async deletarAgendamento(req, res) {
-        // Implementação futura
+    static async cancelarAgendamento(req, res) {
+        try {
+            const {id} = req.params;
+
+            if(!id){
+                return res.status(400).json({message: "ID não informado"});
+            }
+            const [existe] = await conexao.query('SELECT id FROM agendamentos WHERE id =?', [id]);
+
+            if(existe.length === 0){
+                return res.status(400).json({message:"Agendamento não encontrado"});
+            }
+
+            const query = 'UPDATE agendamentos SET status = ? WHERE id = ?';
+            await conexao.query(query, ['cancelado', id]);
+
+            return res.status(200).json({message: "Agendamento cancelado com sucesso"});
+
+        } catch (err) {
+            return res.status(500).json({message: "Erro ao cancelar o agendamento", detalhe: err.message});
+        }
     }
 }
 

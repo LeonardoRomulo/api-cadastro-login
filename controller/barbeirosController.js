@@ -1,5 +1,6 @@
 import Barbeiro from "../model/barbeiros.js";
 import conexao from "../model/conexao.js";
+import cloudinary from "../middleware/cloudinartConfig.js";
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
@@ -10,14 +11,41 @@ class BarbeirosController {
     //Metódo para cadastrar um barbeiro
     static async criarBarbeiro(req, res) {
         try {
-            const { nome, email, senha, especialidade, is_adm, foto } = req.body;
+            const { nome, email, senha, especialidade, is_adm } = req.body;
             //Verifica se o email já existe no bd
             const [existe] = await conexao.query('SELECT id FROM barbeiros WHERE email = ?', [email]);
             if (existe.length > 0) {
                 return res.status(409).json({ message: "Email já existe" });
             }
             const senhaHash = await bcrypt.hash(senha, 10);
-            const barbeiro = new Barbeiro(nome, email, senhaHash, especialidade, is_adm, foto);
+
+            function uploadToCloudinary(fileBuffer) {
+                // Cria uma Promise para transformar o método de callback do Cloudinary em algo que pode ser usado com await
+                return new Promise((resolve, reject) => {
+                    // Cria um stream para enviar o arquivo para o Cloudinary
+                    const uploadStream = cloudinary.uploader.upload_stream(
+                        { resource_type: 'image' },
+                        (error, result) => {
+                            // Se houver erro no upload, rejeita a Promise
+                            if (error) return reject(error);
+                            // Se o upload for bem-sucedido, resolve a Promise com a URL da imagem hospedada
+                            resolve(result.secure_url);
+                        }
+                    );
+                    // Envia o conteúdo do arquivo (imagem) para o Cloudinary usando o stream
+                    uploadStream.end(fileBuffer);
+                })
+            }
+
+            let fotoUrl = null;
+            // Se o arquivo de imagem foi enviado pelo front-end, faz o upload para o Cloudinary
+            if (req.file) {
+                // Aguarda o upload terminar e obtém a URL da imagem hospedada
+                fotoUrl = await uploadToCloudinary(req.file.buffer);
+            }
+
+
+            const barbeiro = new Barbeiro(nome, email, senhaHash, especialidade, is_adm, fotoUrl);
             const query = "INSERT INTO barbeiros (nome, email, senha, especialidade, is_adm, foto) VALUES (?, ?, ?, ?, ?, ?)";
             await conexao.query(query, [barbeiro.nome, barbeiro.email, barbeiro.senha, barbeiro.especialidade, barbeiro.is_adm, barbeiro.foto]);
             return res.status(200).json({ message: "Cadastro criado com sucesso" });
@@ -128,7 +156,7 @@ class BarbeirosController {
             return res.status(200).json({ message: "Barbeiro atualizado com sucesso" });
         } catch (err) {
             //retorno da mensagem de erro
-            res.status(500).json({ message: "Barbeiro não encontrado" ,detalhe: err.message });
+            res.status(500).json({ message: "Barbeiro não encontrado", detalhe: err.message });
         }
     }
 

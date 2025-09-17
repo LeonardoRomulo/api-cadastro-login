@@ -4,9 +4,10 @@ import { Router } from 'express';
 
 const routerAgendamentos = Router();
 
-routerAgendamentos.post("/agendamentos", valida, AgendamentoController.criarAgendamento);
-routerAgendamentos.get("/agendamentos", AgendamentoController.listarAgendamentos);
-routerAgendamentos.patch("/agendamentos/:id", AgendamentoController.atualizarAgendamento);
-routerAgendamentos.delete("/agendamentos/:id", AgendamentoController.deletarAgendamento);
+routerAgendamentos.post("/agendamentos/agendar", valida, AgendamentoController.criarAgendamento);
+routerAgendamentos.get("/agendamentos", AgendamentoController.listarAgendamentosBarbeiros);
+routerAgendamentos.get("/agendamentos", AgendamentoController.listarAgendamentosUsuarios);
+routerAgendamentos.patch("/agendamentos/:id",valida, AgendamentoController.atualizarAgendamento);
+routerAgendamentos.delete("/agendamentos/:id", AgendamentoController.cancelarAgendamento);
 
 export default routerAgendamentos;

@@ -101,7 +101,7 @@ class BarbeirosController {
 
             //loop  que usa o metodo nativo do js object.entries que obtem os pares campo e valor que são percorridos pelo loop e adiciona o nome do campo no array campos e o valor no array valores caso caso esse não seja indefenido e atualiza só os campos informados de forma dinâmica.
             for (const [campo, valor] of Object.entries(camposBody)) {
-                if (valor !== 'undefined') {
+                if (valor !== undefined) {
                     campos.push(`${campo} = ?`);
                     valores.push(valor);
                 }
@@ -119,7 +119,7 @@ class BarbeirosController {
                 return res.status(400).json({ message: "Nenhum campo para atualizar" });
             };
             // adiciona o id que será ataulizado no fim do array valores
-            valores.push(id)
+            valores.push(id);
             //Aqui montamos a query dinâmicamente recebendo os campos e os valores concatenados com o join e separado por ,
             const query = `UPDATE barbeiros SET ${campos.join(", ")} WHERE id =?`;
             await conexao.query(query, valores)
@@ -128,7 +128,7 @@ class BarbeirosController {
             return res.status(200).json({ message: "Barbeiro atualizado com sucesso" });
         } catch (err) {
             //retorno da mensagem de erro
-            res.status(500).json({ message: err.message });
+            res.status(500).json({ message: "Barbeiro não encontrado" ,detalhe: err.message });
         }
     }
 

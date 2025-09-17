@@ -42,7 +42,7 @@ class AgendamentoController {
                 return res.status(400).json({ message: "ID não encontrado" });
             }
             const query = 'SELECT a.id, a.data_hora, a.status, s.nome AS servico, u.nome AS usuario FROM agendamentos a JOIN servicos s ON a.servico_id = s.id JOIN usuarios u ON a.usuario_id = u.id WHERE a.barbeiro_id = ? ORDER BY a.data_hora DESC';
-            
+
             const [resultado] = await conexao.query(query, [barbeiro_id]);
             return res.status(200).json(resultado);
         } catch (err) {
@@ -79,7 +79,35 @@ class AgendamentoController {
     }
 
     static async atualizarAgendamento(req, res) {
+        try {
+            const { id } = req.params;
+            const {data_hora, barbeiro_id, servico_id} = req.body;
 
+            const camposBody = {data_hora, barbeiro_id, servico_id};
+            let campos = [];
+            let valores = [];
+
+            for(const [campo, valor] of Object.entries(camposBody)){
+                if(valor !== undefined){
+                    campos.push(`${campo} = ?`);
+                    valores.push(valor);
+                }
+            }
+
+            if(campos.length === 0){
+                return res.status(400).json({message: "nenhum campo para atualizar"});
+            }
+
+            valores.push(id);
+
+            const query = `UPDATE agendamentos SET ${campos.join(", ")} WHERE id =?`;
+
+            await conexao.query(query, valores);
+
+            return res.status(200).json({message:"Agendamento atualizado com sucesso"});
+        } catch (err) {
+            return res.status(500).json({message: "Agendamento não encontrado", detalhe: err.message});
+        }
     }
 
     static async cancelarAgendamento(req, res) {
